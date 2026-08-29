@@ -13,6 +13,11 @@ var thicklist = []
 var transZlist = []
 
 function setup() {
+  //Retina/高分屏下 devicePixelRatio>1，p5会把画布内部像素缓冲区自动放大(如512x512)，
+  //但CSS显示尺寸还是256x256，导致toDataURL()截出来的图比后端预期的256x256大，
+  //传给pix2pix模型和画回output canvas时就会对不齐。锁定为1:1，避免这个缩放差。
+  pixelDensity(1);
+
   // Create a canvas
   inputCanvas = createCanvas(SIZE, SIZE);  //画布大小
   inputCanvas.class('border-box').parent('input');
@@ -338,6 +343,10 @@ function clearCanvas() {
 
   thicklist = [];
   transZlist = [];
+
+  //right输出画布是普通canvas，drawImage画上去的像素不会自动消失，要手动clearRect
+  const outIm = document.getElementById("output");
+  outIm.getContext("2d").clearRect(0, 0, outIm.width, outIm.height);
 }
 
 function transfer() {
@@ -355,7 +364,7 @@ function transfer() {
 
   var image = new Image();
   image.onload = function() {
-      ctx.drawImage(image, 0, 0, SIZE, SIZE*2, 0, 0, 300, 300);
+      ctx.drawImage(image, 0, 0, SIZE, SIZE, 0, 0, outIm.width, outIm.height);
   };
   image.src = "data:image/jpeg;base64,"+responseString;
 

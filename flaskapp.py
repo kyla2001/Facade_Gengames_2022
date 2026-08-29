@@ -19,7 +19,7 @@ model = networks.define_G(input_nc=3,
                           ngf=64, 
                           netG="unet_256")
 
-model = torch.load("./checkpoints/latest_net_G.pth")
+model = torch.load("./checkpoints/latest_net_G.pth", weights_only=False, map_location="cpu")
 # model.load_state_dict(state_dict)
 model.eval()
 
